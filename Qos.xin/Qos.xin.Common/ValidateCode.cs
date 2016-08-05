@@ -59,10 +59,18 @@ namespace Qos.xin.Common
         /// </summary>
         /// <param name="validateCode">验证码内容</param>
         /// <returns></returns>
-        public byte[] CreateValidateGraphic(string validateCode)
+        public byte[] CreateValidateGraphic(string validateCode, int Height)
         {
-            Bitmap image = new Bitmap((int)Math.Ceiling(validateCode.Length * 12.0), 22);
+            //颜色列表，用于验证码、噪线、噪点
+            Color[] color = { Color.Black, Color.Red, Color.Blue, Color.Green, Color.Orange, Color.Brown, Color.Brown, Color.DarkBlue };
+            //字体列表，用于验证码
+            string[] font = { "Times New Roman", "MS Mincho", "Book Antiqua", "Gungsuh", "PMingLiU", "Impact" };
+            //验证码的字符集，去掉了一些容易混淆的字符
+            char[] character = { '2', '3', '4', '5', '6', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y' };
+            Random rnd = new Random();
+            Bitmap image = new Bitmap((int)Math.Ceiling(validateCode.Length * 12.0), Height);
             Graphics g = Graphics.FromImage(image);
+
             try
             {
                 //生成随机生成器
@@ -78,10 +86,27 @@ namespace Qos.xin.Common
                     int y2 = random.Next(image.Height);
                     g.DrawLine(new Pen(Color.Silver), x1, y1, x2, y2);
                 }
-                Font font = new Font("Arial", 12, (FontStyle.Bold | FontStyle.Italic));
-                LinearGradientBrush brush = new LinearGradientBrush(new Rectangle(0, 0, image.Width, image.Height),
-                 Color.Blue, Color.DarkRed, 1.2f, true);
-                g.DrawString(validateCode, font, brush, 3, 2);
+                //for (int i = 0; i < validateCode.Length; i++)
+                //{
+                //    Font font = new Font("Arial", Height * 0.4f, (FontStyle.Bold | FontStyle.Italic));
+                //    LinearGradientBrush brush = new LinearGradientBrush(new Rectangle(0, 0, image.Width, image.Height),
+                //     Color.Blue, Color.DarkRed, 1.0f + Convert.ToSingle(new Random().NextDouble()), true);
+                //    string str = validateCode[i].ToString();
+                //    float strW = g.MeasureString(str, font).Width;
+                //    float strH = g.MeasureString(str, font).Height;
+                //    g.DrawString(str, font, brush, strW * i / 2, (Height - strH) / 2);
+                //}
+                //画验证码字符串
+                for (int i = 0; i < validateCode.Length; i++)
+                {
+                    string str = validateCode[i].ToString();
+                    string fnt = font[rnd.Next(font.Length)];
+                    Font ft = new Font(fnt, 18);
+                    Color clr = color[rnd.Next(color.Length)];
+                    float strW = g.MeasureString(str, ft).Width;
+                    float strH = g.MeasureString(str, ft).Height;
+                    g.DrawString(str, ft, new SolidBrush(clr), strW * i / 2, (Height - strH) / 2);
+                }
                 //画图片的前景干扰点
                 for (int i = 0; i < 100; i++)
                 {
