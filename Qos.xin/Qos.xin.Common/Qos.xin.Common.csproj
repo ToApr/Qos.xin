@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="CustomAttribute.cs" />
     <Compile Include="DataTableExtensions.cs" />
+    <Compile Include="DistinctExtensions.cs" />
     <Compile Include="EncryptUtils.cs" />
     <Compile Include="InterfaceDesc.cs" />
     <Compile Include="JsonBase.cs" />
