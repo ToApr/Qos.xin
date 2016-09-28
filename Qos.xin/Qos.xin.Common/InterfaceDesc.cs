@@ -12,10 +12,10 @@ namespace Qos.xin.Common
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class Desc : System.Attribute
     {
-        public string Desc;
+        public string _Desc;
         public Desc(string Desc)
         {
-            this.Desc = Desc;
+            this._Desc = Desc;
         }
     }
     /// <summary>
@@ -35,9 +35,9 @@ namespace Qos.xin.Common
         }
 
     }
-    public class InterfaceDesc
+    public static class InterfaceDesc
     {
-        public void GetAllDesc()
+        public static List<Inter> GetAllDesc()
         {
             var Interlist = new List<Inter>();
             var types = Assembly.GetCallingAssembly().GetTypes();
@@ -46,7 +46,7 @@ namespace Qos.xin.Common
                 //取接口简介
                 object[] t = types[i].GetCustomAttributes(typeof(Desc), false);
                 //如果为空则下一个
-                if (t == null && t.Count() <= 0) continue;
+                if (t == null || t.Count() <= 0) continue;
                 //将第一个转换成简介对象
                 Desc ud = ((Desc)t[0]);
                 var Parames = new List<Parame>();
@@ -62,10 +62,10 @@ namespace Qos.xin.Common
                 //从最后一个点开始截取字符到末尾
                 string Url = ns.Substring(pos + 1, ns.Length - pos - 1) + "/";
                 if (Url == "Interface/") Url = "";
-                Interlist.Add(new Inter(types[i].BaseType == typeof(System.Web.UI.Page) ? Url + types[i].Name + ".aspx" : Url + types[i].Name + ".ashx", ud.Desc, Parames));
+                Interlist.Add(new Inter(types[i].BaseType == typeof(System.Web.UI.Page) ? Url + types[i].Name + ".aspx" : Url + types[i].Name + ".ashx", ud._Desc, Parames));
 
             }
-            Interlist = Interlist.OrderBy(t => t.Desc).ToList();
+            return Interlist.OrderBy(t => t.Desc).ToList();
         }
 
     }
