@@ -61,7 +61,6 @@ namespace Qos.xin.Common
                 int pos = ns.LastIndexOf('.');
                 //从最后一个点开始截取字符到末尾
                 string Url = ns.Substring(pos + 1, ns.Length - pos - 1) + "/";
-                if (Url == "Interface/") Url = "";
                 Interlist.Add(new Inter(types[i].BaseType == typeof(System.Web.UI.Page) ? Url + types[i].Name + ".aspx" : Url + types[i].Name + ".ashx", ud._Desc, Parames));
 
             }
