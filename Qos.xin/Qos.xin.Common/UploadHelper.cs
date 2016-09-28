@@ -7,7 +7,7 @@ using System.Text;
 using System.Web;
 using System.Web.UI.HtmlControls;
 
-namespace MS4S.Common
+namespace Qos.xin.Common
 {
 
     public static class UploadHelper
