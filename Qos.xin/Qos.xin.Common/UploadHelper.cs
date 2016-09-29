@@ -12,28 +12,55 @@ namespace Qos.xin.Common
 
     public static class UploadHelper
     {
-        public static string[] AllowFile = new string[] { ".jpg", ".jpeg", ".gif", ".png" };
-        /// <summary>
-        /// 上传图片
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="_Width"></param>
-        /// <param name="_Height"></param>
-        /// <returns></returns>
-        public static string Upload(HttpPostedFileBase file)
-        {
-            HttpPostedFileBase jpeg_image_upload = file as HttpPostedFileBase;
-            var image = System.Drawing.Image.FromStream(jpeg_image_upload.InputStream);
+        public class UploadStatus{
 
+            public bool Status { get; set; }
+            public string Result { get; set; }
+        }
+
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="file">文件对象</param>
+        /// <param name="FilePath">文件保存路径(相对网站根目录路径)</param>
+        /// <param name="AllowFileType">允许上传的文件类型</param>
+        /// <returns>返回上传状态及上传后的新文件路径</returns>
+        public static UploadStatus Upload(HttpPostedFile file, string FilePath, string[] AllowFileType)
+        {
+            var US = new UploadStatus();
             string extend = Path.GetExtension(file.FileName).ToLower();
-            string FileName = (DateTime.Now - new DateTime(1970, 1, 1)).Ticks.ToString() + "_" + new Random().Next(10000, 99999).ToString();
-            string carimg = "";
-            if (extend == ".jpg" || extend == ".png" || extend == ".gif" || extend == ".jpeg")
-            {
-                carimg = CreateThumbnail(file, "upload/images/", extend, image.Width, image.Height, FileName,ZoomType.不变形);
-                CreateThumbnail(file, "upload/images/", extend, image.Width / 4, image.Height / 4, FileName + "_small",ZoomType.缩略图);
+            string url = string.Empty;
+            if (AllowFileType.Contains(extend.ToLower()))
+            { 
+                string FileName = (DateTime.Now - new DateTime(1970, 1, 1)).Ticks.ToString() + "_" + new Random().Next(10000, 99999).ToString();
+                switch (file.ContentType)
+                {
+                    case "application/pdf":
+                    case "application/msword":
+                    case "application/vnd.ms-excel":
+                        file.SaveAs(HttpContext.Current.Server.MapPath("/").TrimEnd('\\')+"\\"+FilePath.Replace('/','\\').TrimEnd('\\')+"\\"+ FileName+extend);
+                        US.Result=FilePath.TrimEnd('\\') + "/" + FileName + extend;
+                        US.Status = true;
+                        break;
+                    case "image/jpeg":
+                    case "image/jpg":
+                        var image = System.Drawing.Image.FromStream(file.InputStream);
+                        CreateThumbnail(file, FilePath, extend, image.Width / 4, image.Height / 4, FileName + "_small", ZoomType.缩略图);
+                        US.Result = CreateThumbnail(file, FilePath, extend, image.Width, image.Height, FileName, ZoomType.不变形);
+                        US.Status = true;
+                        break;
+                    default:
+                        US.Result = "未知的Mime-Type";
+                        US.Status = false;
+                        break;
+                }
             }
-            return carimg;
+            else
+            {
+                US.Status = false;
+                US.Result = "文件格式不允许!";
+            }
+            return US;
         }
         /// <summary>
         /// 上传图片
@@ -51,15 +78,15 @@ namespace Qos.xin.Common
             string carimg = "";
             if (extend == ".jpg" || extend == ".png" || extend == ".gif" || extend == ".jpeg")
             {
-                carimg = CreateThumbnail(file, "upload/images/", extend, _Width, _Height, FileName,ZoomType.不变形);
+                carimg = CreateThumbnail(file, "upload/images/", extend, _Width, _Height, FileName, ZoomType.不变形);
                 CreateThumbnail(file, "upload/images/", extend, _Width / 4, _Height / 4, FileName + "_small", ZoomType.缩略图);
             }
             return carimg;
         }
-        public static string Upload(string Image)
+        public static string Upload(string Image, string[] AllowFileType)
         {
             string expend = Image.Substring(0, 5).Trim();
-            if (AllowFile.Contains(expend.ToLower()))
+            if (AllowFileType.Contains(expend.ToLower()))
             {
 
                 byte[] bytes = Convert.FromBase64String(Image.Substring(5));
@@ -77,10 +104,10 @@ namespace Qos.xin.Common
             }
             return "";
         }
-        public static string UploadPortrait(string Image)
+        public static string UploadPortrait(string Image, string[] AllowFileType)
         {
             string expend = Image.Substring(0, 5).Trim();
-            if (AllowFile.Contains(expend.ToLower()))
+            if (AllowFileType.Contains(expend.ToLower()))
             {
 
                 byte[] bytes = Convert.FromBase64String(Image.Substring(5));
@@ -226,5 +253,6 @@ namespace Qos.xin.Common
         }
 
         public enum ZoomType { 缩略图 = 0, 不变形, 不变形中心放大 }
+
     }
 }
