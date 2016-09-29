@@ -33,24 +33,35 @@ namespace Qos.xin.Common
             if (AllowFileType.Contains(extend.ToLower()))
             { 
                 string FileName = (DateTime.Now - new DateTime(1970, 1, 1)).Ticks.ToString() + "_" + new Random().Next(10000, 99999).ToString();
-                switch (file.ContentType)
+                string _filePath = HttpContext.Current.Server.MapPath("/").TrimEnd('\\') + "\\" + FilePath.Replace('/', '\\').TrimEnd('\\') + "\\";
+                if (!Directory.Exists(_filePath))
+                    Directory.CreateDirectory(_filePath);
+                switch (extend)
                 {
-                    case "application/pdf":
-                    case "application/msword":
-                    case "application/vnd.ms-excel":
-                        file.SaveAs(HttpContext.Current.Server.MapPath("/").TrimEnd('\\')+"\\"+FilePath.Replace('/','\\').TrimEnd('\\')+"\\"+ FileName+extend);
+                    case ".pdf":
+                    case ".doc":
+                    case ".docx":
+                    case ".xls":
+                    case ".xlsx":
+                    case ".mp4":
+                    case ".mov":
+                    case ".mp3":
+                        file.SaveAs(_filePath+ FileName+extend);
                         US.Result=FilePath.TrimEnd('\\') + "/" + FileName + extend;
                         US.Status = true;
                         break;
-                    case "image/jpeg":
-                    case "image/jpg":
+                    case ".jpeg":
+                    case ".jpg":
+                    case ".png":
+                    case ".gif":
+                    case ".bmp":
                         var image = System.Drawing.Image.FromStream(file.InputStream);
                         CreateThumbnail(file, FilePath, extend, image.Width / 4, image.Height / 4, FileName + "_small", ZoomType.缩略图);
                         US.Result = CreateThumbnail(file, FilePath, extend, image.Width, image.Height, FileName, ZoomType.不变形);
                         US.Status = true;
                         break;
                     default:
-                        US.Result = "未知的Mime-Type";
+                        US.Result = "未知的文件类型!";
                         US.Status = false;
                         break;
                 }
@@ -225,12 +236,15 @@ namespace Qos.xin.Common
                 Rectangle SrcRec = new Rectangle(original_paste_x, original_paste_y, original_width, original_height);
                 Rectangle targetRec = new Rectangle(target_paste_x, target_paste_y, target_width1, target_height1);
                 graphic.DrawImage(original_image, targetRec, SrcRec, GraphicsUnit.Pixel);
-                string saveFileName = uploaddir + filename + ext;
-                using (FileStream fs = new FileStream(HttpContext.Current.Server.MapPath("/" + saveFileName), FileMode.Create))
+                string saveFileName = filename + ext;
+                string path = HttpContext.Current.Server.MapPath("/" +  uploaddir);
+                if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+                using (FileStream fs = new FileStream(path.TrimEnd('\\')+"\\"+saveFileName, FileMode.Create))
                 {
 
                     final_image.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    ThumbnailFilename = "/" + saveFileName;
+                    ThumbnailFilename =uploaddir.TrimEnd('/')+ "/" + saveFileName;
                 }
             }
             catch (Exception ex)
