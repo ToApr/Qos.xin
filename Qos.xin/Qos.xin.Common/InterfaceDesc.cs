@@ -56,14 +56,15 @@ namespace Qos.xin.Common
                 //把所有特性加到特性列表里
                 for (int j = p.Length - 1; j >= 0; j--)
                     Parames.Add(new Parame(((Parames)p[j]).Par, ((Parames)p[j]).val, ((Parames)p[j]).PDesc));
-                ////获取程序集的命名空间名
-                //string ns = types[i].Namespace;
-                //int pos = ns.LastIndexOf('.');
-                ////从最后一个点开始截取字符到末尾
-                //string Url = ns.Substring(pos + 1, ns.Length - pos - 1) + "/";
-                Interlist.Add(new Inter(types[i].BaseType == typeof(System.Web.UI.Page) ? types[i].Name + ".aspx" : types[i].Name + ".ashx", ud._Desc, Parames));
+                //获取程序集的命名空间名
+                string ns = types[i].Namespace;
+                string Url = "";
+                var ls=ns.Split('.');
+                if (ls.Length > 2)
+                    Url = ls.LastOrDefault() + "/";
+                Interlist.Add(new Inter(types[i].BaseType == typeof(System.Web.UI.Page) ? types[i].Name + ".aspx" : Url+types[i].Name + ".ashx", ud._Desc, Parames));
 
-            }
+            }//NPCWeb.Buss.Meeting   NPCWeb.Buss
             return Interlist.OrderBy(t => t.Desc).ToList();
         }
 
