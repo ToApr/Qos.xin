@@ -25,7 +25,7 @@ namespace Qos.xin.Common
         /// <param name="FilePath">文件保存路径(相对网站根目录路径)</param>
         /// <param name="AllowFileType">允许上传的文件类型</param>
         /// <returns>返回上传状态及上传后的新文件路径</returns>
-        public static UploadStatus Upload(HttpPostedFile file, string FilePath, string[] AllowFileType)
+        public static UploadStatus Upload(HttpPostedFileBase file, string FilePath, string[] AllowFileType)
         {
             var US = new UploadStatus();
             string extend = Path.GetExtension(file.FileName).ToLower();

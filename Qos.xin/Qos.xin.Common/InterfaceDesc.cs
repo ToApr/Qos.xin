@@ -81,7 +81,16 @@ namespace Qos.xin.Common
         public string Desc { get; set; }
         public List<Parame> Parameter { get; set; }
 
-
+        public string ToUrl()
+        {
+            string url = "";
+            foreach (var item in Parameter)
+            {
+                url += item.Name + "=" + item.Value + "&";
+            }
+            if (url.Length > 0) url.Remove(url.Length);
+            return url;
+        }
     }
     public class Parame
     {
