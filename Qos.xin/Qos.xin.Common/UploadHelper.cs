@@ -25,7 +25,7 @@ namespace Qos.xin.Common
         /// <param name="FilePath">文件保存路径(相对网站根目录路径)</param>
         /// <param name="AllowFileType">允许上传的文件类型</param>
         /// <returns>返回上传状态及上传后的新文件路径</returns>
-        public static UploadStatus Upload(HttpPostedFileBase file, string FilePath, string[] AllowFileType)
+        public static UploadStatus Upload(HttpPostedFile file, string FilePath, string[] AllowFileType)
         {
             var US = new UploadStatus();
             string extend = Path.GetExtension(file.FileName).ToLower();
@@ -48,6 +48,54 @@ namespace Qos.xin.Common
                     case ".mp3":
                         file.SaveAs(_filePath+ FileName+extend);
                         US.Result=FilePath.TrimEnd('\\') + "/" + FileName + extend;
+                        US.Status = true;
+                        break;
+                    case ".jpeg":
+                    case ".jpg":
+                    case ".png":
+                    case ".gif":
+                    case ".bmp":
+                        var image = System.Drawing.Image.FromStream(file.InputStream);
+                        CreateThumbnail(file, FilePath, extend, image.Width / 4, image.Height / 4, FileName + "_small", ZoomType.缩略图);
+                        US.Result = CreateThumbnail(file, FilePath, extend, image.Width, image.Height, FileName, ZoomType.不变形);
+                        US.Status = true;
+                        break;
+                    default:
+                        US.Result = "未知的文件类型!";
+                        US.Status = false;
+                        break;
+                }
+            }
+            else
+            {
+                US.Status = false;
+                US.Result = "文件格式不允许!";
+            }
+            return US;
+        }
+        public static UploadStatus Upload(HttpPostedFileBase file, string FilePath, string[] AllowFileType)
+        {
+            var US = new UploadStatus();
+            string extend = Path.GetExtension(file.FileName).ToLower();
+            string url = string.Empty;
+            if (AllowFileType.Contains(extend.ToLower()))
+            {
+                string FileName = (DateTime.Now - new DateTime(1970, 1, 1)).Ticks.ToString() + "_" + new Random().Next(10000, 99999).ToString();
+                string _filePath = HttpContext.Current.Server.MapPath("/").TrimEnd('\\') + "\\" + FilePath.Replace('/', '\\').TrimEnd('\\') + "\\";
+                if (!Directory.Exists(_filePath))
+                    Directory.CreateDirectory(_filePath);
+                switch (extend)
+                {
+                    case ".pdf":
+                    case ".doc":
+                    case ".docx":
+                    case ".xls":
+                    case ".xlsx":
+                    case ".mp4":
+                    case ".mov":
+                    case ".mp3":
+                        file.SaveAs(_filePath + FileName + extend);
+                        US.Result = FilePath.TrimEnd('\\') + "/" + FileName + extend;
                         US.Status = true;
                         break;
                     case ".jpeg":

@@ -88,8 +88,7 @@ namespace Qos.xin.Common
             {
                 url += item.Name + "=" + item.Value + "&";
             }
-            if (url.Length > 0) url.Remove(url.Length);
-            return url;
+            return url.TrimEnd('&');
         }
     }
     public class Parame
