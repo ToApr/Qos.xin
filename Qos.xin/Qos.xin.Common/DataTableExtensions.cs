@@ -27,14 +27,6 @@ namespace Qos.xin.Common
                         {
                             PI.SetValue(t, value, null);
                         }
-                        //else if (PI.PropertyType == typeof(Int32))
-                        //{
-                        //    PI.SetValue(t, 0, null);
-                        //}
-                        //else if (PI.PropertyType == typeof(string))
-                        //{
-                        //    PI.SetValue(t, "", null);
-                        //}
                     }
                 }
                 list.Add(t);
