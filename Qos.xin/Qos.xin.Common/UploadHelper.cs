@@ -32,18 +32,18 @@ namespace Qos.xin.Common
         /// <returns>返回上传状态及上传后的新文件路径</returns>
         public static UploadStatus Upload(HttpFileCollection fileCollection, string FilePath, string[] AllowFileType)
         {
-            var us = new UploadStatus();
-            foreach (HttpPostedFile item in fileCollection)
-            {
-               var k=Upload(item, FilePath, AllowFileType);
-               if (!k.Status)
+            var US = new UploadStatus();
+            for (int i = 0; i < fileCollection.Count; i++)
+			{
+		        US=Upload(fileCollection.Get(i), FilePath, AllowFileType);
+               if (!US.Status)
                {
-                   us.Msg = "图片[" + item.FileName + "]上传失败!";
-                   us.Status = false;
+                   US.Msg = "图片[" + fileCollection.Get(i).FileName + "]上传失败!";
+                   US.Status = false;
                    break;
                }
-            }
-            return us;
+			} 
+            return US;
         }
         /// <summary>
         /// 上传文件
