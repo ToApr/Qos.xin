@@ -181,6 +181,7 @@ namespace Qos.xin.Common
             }
             catch (Exception e)
             {
+                throw e;
             }
             return result;
         }

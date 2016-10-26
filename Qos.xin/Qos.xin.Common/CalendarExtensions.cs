@@ -33,7 +33,7 @@ namespace Qos.xin.Common
         /// <returns>Html文本</returns>
         public static MvcHtmlString Calendar(this HtmlHelper helper, string name, string format)
         {
-            return GenerateHtml(name, null, format);
+            return GenerateHtml(name, null, format,null);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Qos.xin.Common
         /// <returns>Html文本</returns>
         public static MvcHtmlString Calendar(this HtmlHelper helper, string name, DateTime date, string format)
         {
-            return GenerateHtml(name, date, format);
+            return GenerateHtml(name, date, format,null);
         }
 
         /// <summary>
@@ -139,11 +139,11 @@ namespace Qos.xin.Common
             object data = ModelMetadata.FromLambdaExpression<TModel, TProperty>(expression, helper.ViewData).Model;
             if (data != null && DateTime.TryParse(data.ToString(), out value))
             {
-                return GenerateHtml(name, value, format);
+                return GenerateHtml(name, value, format,null);
             }
             else
             {
-                return GenerateHtml(name, null, format);
+                return GenerateHtml(name, null, format,null);
             }
         }
 
