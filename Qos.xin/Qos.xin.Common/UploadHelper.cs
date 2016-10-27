@@ -33,6 +33,12 @@ namespace Qos.xin.Common
         public static UploadStatus Upload(HttpFileCollection fileCollection, string FilePath, string[] AllowFileType)
         {
             var US = new UploadStatus();
+            if (fileCollection.Count <= 0)
+            {
+                US.Status = false;
+                US.Msg = "没有提交图片.";
+                return US;
+            }
             for (int i = 0; i < fileCollection.Count; i++)
 			{
 		        US=Upload(fileCollection.Get(i), FilePath, AllowFileType);
