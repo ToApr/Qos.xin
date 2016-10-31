@@ -244,7 +244,7 @@ namespace Qos.xin.Common
                 {
                     Directory.CreateDirectory(path);
                 }
-                b.Save(path + FileName);
+                b.Save(path.Trim('/')+"/"+ FileName);
                 b.Dispose();
                 US.Status = true;
                 US.Url.Add(ImagePath.Trim('/')+"/" + FileName);
