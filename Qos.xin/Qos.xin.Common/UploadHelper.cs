@@ -239,7 +239,7 @@ namespace Qos.xin.Common
                 MemoryStream ms = new MemoryStream(bytes);
                 Bitmap b = new Bitmap(ms);
                 string FileName = (DateTime.Now - new DateTime(1970, 1, 1)).Ticks.ToString() + "_" + new Random().Next(10000, 99999).ToString() + expend;
-                string path = HttpContext.Current.Server.MapPath("/").Trim('\\') + "\\upload\\Portrait\\";
+                string path = HttpContext.Current.Server.MapPath(ImagePath);
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -247,7 +247,7 @@ namespace Qos.xin.Common
                 b.Save(path + FileName);
                 b.Dispose();
                 US.Status = true;
-                US.Url.Add(ImagePath.Trim('/') + FileName);
+                US.Url.Add(ImagePath.Trim('/')+"/" + FileName);
             }
             else
             {
