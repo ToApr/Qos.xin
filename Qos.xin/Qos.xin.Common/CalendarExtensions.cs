@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using System.Web.Mvc;
 using System.Web;
 using System.Web.Mvc.Properties;
+using System.Web.Routing;
+using System.ComponentModel;
 namespace Qos.xin.Common
 {
     public static class CalendarExtensions
@@ -23,19 +25,6 @@ namespace Qos.xin.Common
         {
             return Calendar(helper, name, defaultFormat);
         }
-
-        /// <summary>
-        /// 使用特定的名称生成控件
-        /// </summary>
-        /// <param name="helper">HtmlHelper对象</param>
-        /// <param name="name">控件名称</param>
-        /// <param name="format">显示格式</param>
-        /// <returns>Html文本</returns>
-        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, string format)
-        {
-            return GenerateHtml(name, null, format,null);
-        }
-
         /// <summary>
         /// 使用特定的名称和初始值生成控件
         /// </summary>
@@ -47,7 +36,52 @@ namespace Qos.xin.Common
         {
             return Calendar(helper, name, date, defaultFormat);
         }
-
+        /// <summary>
+        /// 使用特定的名称和初始值生成控件
+        /// </summary>
+        /// <param name="helper">HtmlHelper对象</param>
+        /// <param name="name">控件名称</param>
+        /// <param name="date">要显示的日期时间</param>
+        /// <returns>Html文本</returns>
+        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, DateTime date, object htmlAttributes)
+        {
+            return Calendar(helper, name, date, defaultFormat, htmlAttributes);
+        }
+        /// <summary>
+        /// 使用特定的名称生成控件
+        /// </summary>
+        /// <param name="helper">HtmlHelper对象</param>
+        /// <param name="name">控件名称</param>
+        /// <param name="format">显示格式</param>
+        /// <returns>Html文本</returns>
+        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, object htmlAttributes)
+        {
+            return GenerateHtml(name, null, null, (IDictionary<string, object>)HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
+        }
+        /// <summary>
+        /// 使用特定的名称生成控件
+        /// </summary>
+        /// <param name="helper">HtmlHelper对象</param>
+        /// <param name="name">控件名称</param>
+        /// <param name="format">显示格式</param>
+        /// <returns>Html文本</returns>
+        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, string format)
+        {
+            return GenerateHtml(name, null, format, null);
+        }
+       
+        /// <summary>
+        /// 使用特定的名称生成控件
+        /// </summary>
+        /// <param name="helper">HtmlHelper对象</param>
+        /// <param name="name">控件名称</param>
+        /// <param name="format">显示格式</param>
+        /// <returns>Html文本</returns>
+        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, string format, object htmlAttributes)
+        {
+            return Calendar(helper,name,null,format, htmlAttributes);
+        }
+        
         /// <summary>
         /// 使用特定的名称和初始值生成控件
         /// </summary>
@@ -58,7 +92,19 @@ namespace Qos.xin.Common
         /// <returns>Html文本</returns>
         public static MvcHtmlString Calendar(this HtmlHelper helper, string name, DateTime date, string format)
         {
-            return GenerateHtml(name, date, format,null);
+            return Calendar(helper,name, date, format, null);
+        }
+        /// <summary>
+        /// 使用特定的名称和初始值生成控件
+        /// </summary>
+        /// <param name="helper">HtmlHelper对象</param>
+        /// <param name="name">控件名称</param>
+        /// <param name="date">要显示的日期时间</param>
+        /// <param name="format">显示格式</param>
+        /// <returns>Html文本</returns>
+        public static MvcHtmlString Calendar(this HtmlHelper helper, string name, DateTime? date, string format, object htmlAttributes)
+        {
+            return GenerateHtml(name, date, format, (IDictionary<string, object>)HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
 
         /// <summary>
@@ -101,6 +147,12 @@ namespace Qos.xin.Common
         public static MvcHtmlString CalendarFor<TModel, TProperty>(this HtmlHelper<TModel> helper, Expression<Func<TModel, TProperty>> expression, object htmlAttributes)
         {
             string name = ExpressionHelper.GetExpressionText(expression);
+            DateTime value;
+            object data = ModelMetadata.FromLambdaExpression<TModel, TProperty>(expression, helper.ViewData).Model;
+            if (data != null && DateTime.TryParse(data.ToString(), out value))
+            {
+                return GenerateHtml(name, value, defaultFormat, (IDictionary<string, object>)HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
+            }
             return GenerateHtml(name, null, defaultFormat, (IDictionary<string, object>)HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
         /// <summary>
@@ -139,11 +191,11 @@ namespace Qos.xin.Common
             object data = ModelMetadata.FromLambdaExpression<TModel, TProperty>(expression, helper.ViewData).Model;
             if (data != null && DateTime.TryParse(data.ToString(), out value))
             {
-                return GenerateHtml(name, value, format,null);
+                return GenerateHtml(name, value, format, null);
             }
             else
             {
-                return GenerateHtml(name, null, format,null);
+                return GenerateHtml(name, null, format, null);
             }
         }
 
@@ -167,25 +219,29 @@ namespace Qos.xin.Common
         private static MvcHtmlString GenerateHtml(string name, DateTime? date, string format, IDictionary<string, object> attributes)
         {
             StringBuilder html = new StringBuilder("<input type=\"text\" id=\"" + name + "\" name=\"" + name + "\" onfocus=\"WdatePicker({dateFmt:'" + format + "'})\"");
-            if (attributes.ContainsKey("class"))
+            if (attributes != null)
             {
-                attributes["class"] = "Wdate " + attributes["class"];
-            }
-            else
-            {
-                attributes.Add("class", "Wdate");
-            }
-            foreach (var item in attributes)
-            {
-                html.Append(item.Key + "=\"" + item.Value + "\" ");
-            }
-            if (date != null)
-            {
-                html.Append("value=\"" + date.Value.ToString(format) + "\"");
-            }
-            else
-            {
-                html.Append("value=\"\"");
+                if (attributes.ContainsKey("class"))
+                {
+                    attributes["class"] = "Wdate " + attributes["class"];
+                }
+                else
+                {
+                    attributes.Add("class", "Wdate " + attributes["class"]);
+                }
+
+                foreach (var item in attributes)
+                {
+                    html.Append(item.Key + "=\"" + item.Value + "\" ");
+                }
+                if (date != null)
+                {
+                    html.Append("value=\"" + date.Value.ToString(format) + "\"");
+                }
+                else
+                {
+                    html.Append("value=\"\"");
+                }
             }
             html.Append("/>");
 
