@@ -10,7 +10,7 @@ namespace Qos.xin.Common
 {
     public static class DataTableExtensions
     {
-        public static List<T> Convert<T>(this DataTable dt) where T : new()
+        public static IEnumerable<T> Convert<T>(this DataTable dt) where T : new()
         {
             List<T> list = new List<T>();
             foreach (DataRow dr in dt.Rows)
@@ -31,7 +31,7 @@ namespace Qos.xin.Common
                 }
                 list.Add(t);
             }
-            return list;
+            return list.AsEnumerable();
         }
     }
 }
